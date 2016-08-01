@@ -4,6 +4,10 @@
 
 #define TH_OMP_OVERHEAD_THRESHOLD 100000
 
+#ifndef NAN
+  #define NAN (nan(NULL))
+#endif
+
 void THTensor_(fill)(THTensor *r_, real value)
 {
   TH_TENSOR_APPLY(real, r_,
