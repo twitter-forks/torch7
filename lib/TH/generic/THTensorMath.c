@@ -103,7 +103,7 @@ void THTensor_(nonzero)(THLongTensor *subscript, THTensor *tensor)
   long dim;
   long div = 1;
 #ifdef TH_REAL_IS_HALF
-#define IS_NONZERO(val) (TH_half2float(val)!=0)
+#define IS_NONZERO(val) ((val.x & 0x7fff) != 0)
 #else
 #define IS_NONZERO(val) ((val)!=0)
 #endif
@@ -2154,10 +2154,6 @@ void THTensor_(catArray)(THTensor *result, THTensor **inputs, int numInputs, int
         // accumulate the size over the dimension we want to cat on.
         // Empty tensors are allowed
         dimSize += i < inputs[j]->nDimension ? inputs[j]->size[i] : THMin(inputs[j]->nDimension, 1);
-        if(inputs[j]->nDimension)
-        {
-          allContiguous = allContiguous && THTensor_(isContiguous)(inputs[j]);
-        }
       }
     }
     else
@@ -2188,6 +2184,12 @@ void THTensor_(catArray)(THTensor *result, THTensor **inputs, int numInputs, int
   {
     THTensor_(resize)(result, size, NULL);
 
+    // Check contiguity of all inputs and result
+    for (i = 0; i < numInputs; i++) {
+      if(inputs[i]->nDimension) {
+        allContiguous = allContiguous && THTensor_(isContiguous)(inputs[i]);
+      }
+    }
     allContiguous = allContiguous && THTensor_(isContiguous)(result);
 
     // First path is for contiguous inputs along dim 1
@@ -2256,25 +2258,25 @@ int THTensor_(equal)(THTensor *ta, THTensor* tb)
 #define TENSOR_IMPLEMENT_LOGICAL(NAME,OP)				\
   void THTensor_(NAME##Value)(THByteTensor *r_, THTensor* t, real value)	\
   {									\
-    THByteTensor_rawResize(r_, t->nDimension, t->size, NULL);		\
+    THByteTensor_resizeNd(r_, t->nDimension, t->size, NULL);		\
     TH_TENSOR_APPLY2(unsigned char, r_, real, t,			\
 		     *r__data = (*t_data OP value) ? 1 : 0;); \
   }									\
   void THTensor_(NAME##ValueT)(THTensor* r_, THTensor* t, real value)	\
   {									\
-    THTensor_(rawResize)(r_, t->nDimension, t->size, NULL);		\
+    THTensor_(resizeNd)(r_, t->nDimension, t->size, NULL);		\
     TH_TENSOR_APPLY2(real, r_, real, t,					\
 		     *r__data = (*t_data OP value) ? 1 : 0;); \
   }									\
   void THTensor_(NAME##Tensor)(THByteTensor *r_, THTensor *ta, THTensor *tb) \
   {									\
-    THByteTensor_rawResize(r_, ta->nDimension, ta->size, NULL);		\
+    THByteTensor_resizeNd(r_, ta->nDimension, ta->size, NULL);		\
     TH_TENSOR_APPLY3(unsigned char, r_, real, ta, real, tb,		\
 		     *r__data = (*ta_data OP *tb_data) ? 1 : 0;); \
   }									\
   void THTensor_(NAME##TensorT)(THTensor *r_, THTensor *ta, THTensor *tb) \
   {									\
-    THTensor_(rawResize)(r_, ta->nDimension, ta->size, NULL);		\
+    THTensor_(resizeNd)(r_, ta->nDimension, ta->size, NULL);		\
     TH_TENSOR_APPLY3(real, r_, real, ta, real, tb,			\
 		     *r__data = (*ta_data OP *tb_data) ? 1 : 0;); \
   }									\
