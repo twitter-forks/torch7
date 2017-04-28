@@ -311,14 +311,14 @@ for _,Tensor in ipairs({"ByteTensor", "CharTensor",
          {name=Tensor, method={default=1}},
          {name=real}})
 
-   wrap("lsh",
-        cname("lsh"),
+   wrap("lshift",
+        cname("lshift"),
         {{name=Tensor, default=true, returned=true, method={default='nil'}},
          {name=Tensor, method={default=1}},
          {name=real}})
 
-   wrap("rsh",
-        cname("rsh"),
+   wrap("rshift",
+        cname("rshift"),
         {{name=Tensor, default=true, returned=true, method={default='nil'}},
          {name=Tensor, method={default=1}},
          {name=real}})
@@ -331,6 +331,24 @@ for _,Tensor in ipairs({"ByteTensor", "CharTensor",
 
    wrap("remainder",
         cname("remainder"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=real}})
+
+   wrap("bitand",
+        cname("bitand"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=real}})
+
+   wrap("bitor",
+        cname("bitor"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=real}})
+
+   wrap("bitxor",
+        cname("bitxor"),
         {{name=Tensor, default=true, returned=true, method={default='nil'}},
          {name=Tensor, method={default=1}},
          {name=real}})
@@ -376,6 +394,18 @@ for _,Tensor in ipairs({"ByteTensor", "CharTensor",
          {name=Tensor, method={default=1}},
          {name=Tensor}})
 
+   wrap("clshift",
+        cname("clshift"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=Tensor}})
+
+   wrap("crshift",
+        cname("crshift"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=Tensor}})
+
    wrap("cfmod",
         cname("cfmod"),
         {{name=Tensor, default=true, returned=true, method={default='nil'}},
@@ -384,6 +414,24 @@ for _,Tensor in ipairs({"ByteTensor", "CharTensor",
 
    wrap("cremainder",
         cname("cremainder"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=Tensor}})
+
+   wrap("cbitand",
+        cname("cbitand"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=Tensor}})
+
+   wrap("cbitor",
+        cname("cbitor"),
+        {{name=Tensor, default=true, returned=true, method={default='nil'}},
+         {name=Tensor, method={default=1}},
+         {name=Tensor}})
+
+   wrap("cbitxor",
+        cname("cbitxor"),
         {{name=Tensor, default=true, returned=true, method={default='nil'}},
          {name=Tensor, method={default=1}},
          {name=Tensor}})
