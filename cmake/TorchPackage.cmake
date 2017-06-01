@@ -1,16 +1,12 @@
 # -*- cmake -*-
 
 MACRO(ADD_TORCH_LIBRARY package type src)
-IF ("${type}" STREQUAL "STATIC")
-  if ("${src}" MATCHES "cu$" OR "${src}" MATCHES "cu;")
-    CUDA_ADD_LIBRARY(${package} STATIC ${src})
-  else()
-    ADD_LIBRARY(${package} STATIC ${src})
-  endif()
-ELSE()
-  IF ("$ENV{TH_ONLY_STATIC}" STREQUAL "YES")
-    ADD_LIBRARY(${package} ${type} "")
-    SET_TARGET_PROPERTIES(${package} PROPERTIES LINKER_LANGUAGE C)
+  IF ("${type}" STREQUAL "STATIC")
+    if ("${src}" MATCHES "cu$" OR "${src}" MATCHES "cu;")
+      CUDA_ADD_LIBRARY(${package} STATIC ${src})
+    else()
+      ADD_LIBRARY(${package} STATIC ${src})
+    endif()
   ELSE()
     if ("${src}" MATCHES "cu$" OR "${src}" MATCHES "cu;")
       CUDA_ADD_LIBRARY(${package} ${type} ${src})
@@ -18,7 +14,6 @@ ELSE()
       ADD_LIBRARY(${package} ${type} ${src})
     endif()
   ENDIF()
-ENDIF()
 ENDMACRO()
 
 MACRO(ADD_TORCH_PACKAGE package src luasrc)
@@ -30,7 +25,6 @@ MACRO(ADD_TORCH_PACKAGE package src luasrc)
   IF(NOT "${src}" STREQUAL "")
 
     ADD_TORCH_LIBRARY(${package} MODULE "${src}")
-    ADD_TORCH_LIBRARY(${package}_static STATIC "${src}")
 
     ### Torch packages supposes libraries prefix is "lib"
     SET_TARGET_PROPERTIES(${package} PROPERTIES
@@ -43,10 +37,13 @@ MACRO(ADD_TORCH_PACKAGE package src luasrc)
         LINK_FLAGS "-undefined dynamic_lookup")
     ENDIF()
 
-    SET_TARGET_PROPERTIES(${package}_static PROPERTIES
-      COMPILE_FLAGS "-fPIC")
-    SET_TARGET_PROPERTIES(${package}_static PROPERTIES
-      PREFIX "lib" IMPORT_PREFIX "lib" OUTPUT_NAME "${package}")
+    IF (BUILD_STATIC OR "$ENV{STATIC_TH}" STREQUAL "YES")
+      ADD_TORCH_LIBRARY(${package}_static STATIC "${src}")
+      SET_TARGET_PROPERTIES(${package}_static PROPERTIES
+        COMPILE_FLAGS "-fPIC")
+      SET_TARGET_PROPERTIES(${package}_static PROPERTIES
+        PREFIX "lib" IMPORT_PREFIX "lib" OUTPUT_NAME "${package}")
+    ENDIF()
 
     INSTALL(TARGETS ${package}
       RUNTIME DESTINATION ${Torch_INSTALL_LUA_CPATH_SUBDIR}
